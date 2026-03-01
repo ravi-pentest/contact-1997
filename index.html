@@ -1,0 +1,32 @@
+<form id="contactForm">
+  <input type="text" name="name" placeholder="ඔබේ නම (Optional)">
+  <input type="email" name="email" placeholder="ඊමේල් (Optional)">
+  <textarea name="message" placeholder="පණිවිඩය" required></textarea>
+
+  <input type="hidden" id="ip_address" name="ip_address">
+  <input type="hidden" id="device_info" name="device_info">
+
+  <button type="submit" id="submitBtn">යොමු කරන්න</button>
+</form>
+
+<script>
+  // පරිශීලකයාගේ IP ලිපිනය ලබා ගැනීමට නොමිලේ දෙන API එකක් පාවිච්චි කරමු
+  fetch('https://api.ipify.org?format=json')
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('ip_address').value = data.ip;
+    });
+
+  // පරිශීලකයාගේ Browser සහ Device තොරතුරු ලබා ගැනීම
+  document.getElementById('device_info').value = navigator.userAgent;
+
+  const scriptURL = 'ඔබේ_APPS_SCRIPT_URL_එක_මෙතැනට';
+  const form = document.getElementById('contactForm');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+      .then(response => alert("පණිවිඩය යැවුණා!"))
+      .catch(error => console.error('Error!', error.message));
+  });
+</script>
