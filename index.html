@@ -20,7 +20,7 @@
   // පරිශීලකයාගේ Browser සහ Device තොරතුරු ලබා ගැනීම
   document.getElementById('device_info').value = navigator.userAgent;
 
-  const scriptURL = 'ඔබේ_APPS_SCRIPT_URL_එක_මෙතැනට';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycby1IMOBFclOChCLS9jTqhZQMuglJ146v-3_uoqHzhxZvDU8NnPWpuDd22EaeRXEYAusrg/exec';
   const form = document.getElementById('contactForm');
 
   form.addEventListener('submit', e => {
@@ -29,4 +29,5 @@
       .then(response => alert("පණිවිඩය යැවුණා!"))
       .catch(error => console.error('Error!', error.message));
   });
+
 </script>
