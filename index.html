@@ -3,62 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us</title>
+    <title>Contact Us | අපව සම්බන්ධ කර ගන්න</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .form-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { text-align: center; color: #333; margin-bottom: 20px; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
-        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #0056b3; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        #status-msg { text-align: center; margin-top: 15px; font-weight: bold; display: none; padding: 10px; border-radius: 5px; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+        .contact-card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 400px; 
+        }
+        h2 { text-align: center; color: #333; }
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 15px;
+        }
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #ccc; }
+        #status { 
+            text-align: center; 
+            margin-top: 15px; 
+            font-weight: bold; 
+            display: none; 
+            padding: 10px; 
+            border-radius: 5px; 
+        }
     </style>
 </head>
 <body>
 
-<div class="form-card">
-    <h2>අපව සම්බන්ධ කර ගන්න</h2>
-    <form id="contactForm">
+<div class="contact-card">
+    <h2>අපට පණිවිඩයක් එවන්න</h2>
+    <form id="contact-form">
         <input type="text" name="name" placeholder="ඔබේ නම (අත්‍යවශ්‍ය නැත)">
         <input type="email" name="email" placeholder="ඊමේල් ලිපිනය (අත්‍යවශ්‍ය නැත)">
         
         <textarea name="message" rows="5" placeholder="පණිවිඩය මෙහි ලියන්න..." required></textarea>
 
-        <input type="hidden" name="ip_address" id="ip_field">
-        <input type="hidden" name="device_info" id="device_field">
+        <input type="hidden" name="ip_address" id="ip_address">
+        <input type="hidden" name="device_info" id="device_info">
 
-        <button type="submit" id="submitBtn">යොමු කරන්න</button>
+        <button type="submit" id="submit-btn">යොමු කරන්න</button>
     </form>
-    <div id="status-msg"></div>
+    <div id="status"></div>
 </div>
 
 <script>
-    // 1. ඔබේ Google Script URL එක මෙතැනට දාන්න
-    const scriptURL = 'ඔබේ_GOOGLE_SCRIPT_URL_එක_මෙතැනට';
-    const form = document.getElementById('contactForm');
-    const btn = document.getElementById('submitBtn');
-    const status = document.getElementById('status-msg');
+    // 1. ඔබේ Google Script URL එක පහත තනි උද්ධෘත ලකුණු (' ') ඇතුළත පේස්ට් කරන්න
+    const scriptURL = 'https://script.google.com/macros/s/AKfycby1IMOBFclOChCLS9jTqhZQMuglJ146v-3_uoqHzhxZvDU8NnPWpuDd22EaeRXEYAusrg/exec';
+    const form = document.getElementById('contact-form');
+    const btn = document.getElementById('submit-btn');
+    const statusDiv = document.getElementById('status');
 
-    // රහසිගතව IP සහ Device විස්තර ලබා ගැනීමේ ක්‍රමය
-    async function getClientData() {
+    // පිටුව Load වන විටම IP සහ Device තොරතුරු ලබා ගැනීම
+    async function fetchTrackerData() {
         try {
-            // IP එක ලබා ගැනීමට විශ්වාසදායක සේවාවක්
             const response = await fetch('https://api.ipify.org?format=json');
             const data = await response.json();
-            document.getElementById('ip_field').value = data.ip;
-            
-            // Device සහ Browser විස්තර
-            const details = "Browser: " + navigator.appName + " | OS: " + navigator.platform;
-            document.getElementById('device_field').value = details;
+            document.getElementById('ip_address').value = data.ip;
+            document.getElementById('device_info').value = "OS: " + navigator.platform + " | Browser: " + navigator.userAgent;
         } catch (e) {
-            document.getElementById('ip_field').value = "Not Found";
-            document.getElementById('device_field').value = "Unknown Device";
+            document.getElementById('ip_address').value = "Not Captured";
+            document.getElementById('device_info').value = navigator.userAgent;
         }
     }
-
-    // පිටුව ලෝඩ් වූ විගස දත්ත ලබා ගැනීම අරඹන්න
-    getClientData();
+    fetchTrackerData();
 
     form.addEventListener('submit', e => {
         e.preventDefault();
@@ -67,25 +102,23 @@
         
         fetch(scriptURL, { method: 'POST', body: new FormData(form)})
             .then(res => {
-                status.innerText = "පණිවිඩය සාර්ථකව ලැබුණා!";
-                status.style.color = "#155724";
-                status.style.backgroundColor = "#d4edda";
-                status.style.display = "block";
+                statusDiv.innerText = "පණිවිඩය සාර්ථකව ලැබුණා!";
+                statusDiv.style.backgroundColor = "#d4edda";
+                statusDiv.style.color = "#155724";
+                statusDiv.style.display = "block";
                 
                 form.reset(); // පෝරමය සම්පූර්ණයෙන් හිස් කිරීම
-                getClientData(); // නැවත IP සකස් කිරීම
+                fetchTrackerData(); // නැවත IP එක සකස් කිරීම
                 
                 btn.disabled = false;
                 btn.innerText = "යොමු කරන්න";
-                
-                // තත්පර 5කට පසු මැසේජ් එක ඉවත් කරන්න
-                setTimeout(() => { status.style.display = "none"; }, 5000);
+                setTimeout(() => statusDiv.style.display = "none", 5000);
             })
             .catch(err => {
-                status.innerText = "දෝෂයක් සිදු විය! නැවත උත්සාහ කරන්න.";
-                status.style.color = "#721c24";
-                status.style.backgroundColor = "#f8d7da";
-                status.style.display = "block";
+                statusDiv.innerText = "දෝෂයක් සිදු විය! නැවත උත්සාහ කරන්න.";
+                statusDiv.style.backgroundColor = "#f8d7da";
+                statusDiv.style.color = "#721c24";
+                statusDiv.style.display = "block";
                 btn.disabled = false;
                 btn.innerText = "යොමු කරන්න";
             });
