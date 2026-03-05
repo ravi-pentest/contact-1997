@@ -3,124 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us | අපව සම්බන්ධ කර ගන්න</title>
+    <title>Contact Form</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f0f2f5; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-        }
-        .contact-card { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            width: 100%; 
-            max-width: 400px; 
-        }
-        h2 { text-align: center; color: #333; }
-        input, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 10px 0; 
-            border: 1px solid #ccc; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 15px;
-        }
-        button { 
-            width: 100%; 
-            padding: 12px; 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        button:hover { background-color: #0056b3; }
-        button:disabled { background-color: #ccc; }
-        #status { 
-            text-align: center; 
-            margin-top: 15px; 
-            font-weight: bold; 
-            display: none; 
-            padding: 10px; 
-            border-radius: 5px; 
-        }
+        body { font-family: sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .form-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 380px; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+        #status-msg { text-align: center; margin-top: 10px; font-weight: bold; display: none; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-<div class="contact-card">
-    <h2>අපට පණිවිඩයක් එවන්න</h2>
-    <form id="contact-form">
+<div class="form-card">
+    <h2 style="text-align:center">පණිවිඩයක් එවන්න</h2>
+    <form id="contactForm">
         <input type="text" name="name" placeholder="ඔබේ නම (අත්‍යවශ්‍ය නැත)">
-        <input type="email" name="email" placeholder="ඊමේල් ලිපිනය (අත්‍යවශ්‍ය නැත)">
         
-        <textarea name="message" rows="5" placeholder="පණිවිඩය මෙහි ලියන්න..." required></textarea>
+        <input type="text" name="email" placeholder="ඊමේල් ලිපිනය (අත්‍යවශ්‍ය නැත)">
+        
+        <textarea name="message" rows="4" placeholder="පණිවිඩය මෙහි ලියන්න..." required></textarea>
 
-        <input type="hidden" name="ip_address" id="ip_address">
-        <input type="hidden" name="device_info" id="device_info">
+        <input type="hidden" name="ip_address" id="ip_field">
+        <input type="hidden" name="device_info" id="device_field">
 
-        <button type="submit" id="submit-btn">යොමු කරන්න</button>
+        <button type="submit" id="submitBtn">යොමු කරන්න</button>
     </form>
-    <div id="status"></div>
+    <div id="status-msg"></div>
 </div>
 
 <script>
-    // 1. ඔබේ Google Script URL එක පහත තනි උද්ධෘත ලකුණු (' ') ඇතුළත පේස්ට් කරන්න
     const scriptURL = 'https://script.google.com/macros/s/AKfycby1IMOBFclOChCLS9jTqhZQMuglJ146v-3_uoqHzhxZvDU8NnPWpuDd22EaeRXEYAusrg/exec';
-    const form = document.getElementById('contact-form');
-    const btn = document.getElementById('submit-btn');
-    const statusDiv = document.getElementById('status');
+    const form = document.getElementById('contactForm');
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('status-msg');
 
-    // පිටුව Load වන විටම IP සහ Device තොරතුරු ලබා ගැනීම
-    async function fetchTrackerData() {
+    async function getTrackerData() {
         try {
-            const response = await fetch('https://api.ipify.org?format=json');
-            const data = await response.json();
-            document.getElementById('ip_address').value = data.ip;
-            document.getElementById('device_info').value = "OS: " + navigator.platform + " | Browser: " + navigator.userAgent;
-        } catch (e) {
-            document.getElementById('ip_address').value = "Not Captured";
-            document.getElementById('device_info').value = navigator.userAgent;
+            const res = await fetch('https://api.ipify.org?format=json');
+            const data = await res.json();
+            document.getElementById('ip_field').value = data.ip;
+            document.getElementById('device_field').value = navigator.userAgent;
+        } catch (e) { 
+            document.getElementById('ip_field').value = "Not Found";
         }
     }
-    fetchTrackerData();
+    getTrackerData();
 
     form.addEventListener('submit', e => {
         e.preventDefault();
         btn.disabled = true;
-        btn.innerText = "යවමින් පවතී...";
+        btn.innerText = "යවමින්...";
         
         fetch(scriptURL, { method: 'POST', body: new FormData(form)})
             .then(res => {
-                statusDiv.innerText = "පණිවිඩය සාර්ථකව ලැබුණා!";
-                statusDiv.style.backgroundColor = "#d4edda";
-                statusDiv.style.color = "#155724";
-                statusDiv.style.display = "block";
-                
-                form.reset(); // පෝරමය සම්පූර්ණයෙන් හිස් කිරීම
-                fetchTrackerData(); // නැවත IP එක සකස් කිරීම
-                
+                status.innerText = "පණිවිඩය සාර්ථකව ලැබුණා!";
+                status.style.backgroundColor = "#d4edda";
+                status.style.color = "#155724";
+                status.style.display = "block";
+                form.reset();
+                getTrackerData();
                 btn.disabled = false;
                 btn.innerText = "යොමු කරන්න";
-                setTimeout(() => statusDiv.style.display = "none", 5000);
+                setTimeout(() => status.style.display = "none", 5000);
             })
             .catch(err => {
-                statusDiv.innerText = "දෝෂයක් සිදු විය! නැවත උත්සාහ කරන්න.";
-                statusDiv.style.backgroundColor = "#f8d7da";
-                statusDiv.style.color = "#721c24";
-                statusDiv.style.display = "block";
+                status.innerText = "දෝෂයක්! නැවත උත්සාහ කරන්න.";
+                status.style.backgroundColor = "#f8d7da";
+                status.style.display = "block";
                 btn.disabled = false;
-                btn.innerText = "යොමු කරන්න";
             });
     });
 </script>
