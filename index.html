@@ -2,54 +2,136 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <title>Contact 1997</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | 1997</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f4f4f4; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 300px; }
-        input, textarea { width: 100%; margin-bottom: 10px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        /* මුළු පිටුවේම පසුබිම */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+
+        /* පෝරමය තියෙන පෙට්ටිය (Card) */
+        .card { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            width: 100%; 
+            max-width: 400px; 
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover { transform: translateY(-5px); }
+
+        h2 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 25px; 
+            font-size: 24px;
+        }
+
+        /* Input field වල ස්ටයිල් එක */
+        input[type="text"], textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 20px; 
+            border: 2px solid #eee; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            outline: none;
+            transition: border-color 0.3s;
+            font-size: 16px;
+        }
+
+        input:focus, textarea:focus { border-color: #667eea; }
+
+        /* යොමු කරන්න බොත්තම */
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: background 0.3s;
+        }
+
+        button:hover { background: #5a67d8; }
+
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* සාර්ථක පණිවිඩය */
+        #status { 
+            display: none; 
+            text-align: center; 
+            margin-top: 20px; 
+            padding: 10px; 
+            background: #d4edda; 
+            color: #155724; 
+            border-radius: 8px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h3 style="text-align:center">ඔබේ තොරතුරු 1997 අපිට කියන්න</h3>
-        <form id="contact-form">
-            <input type="text" name="name" placeholder="නම">
-            <input type="text" name="email" placeholder="ඊමේල්">
-            <textarea name="message" placeholder="පණිවිඩය" required></textarea>
-            
-            <input type="hidden" name="ip_address" id="ip">
-            <input type="hidden" name="device_info" id="device">
-            
-            <button type="submit" id="btn">යොමු කරන්න</button>
-        </form>
-        <p id="status" style="display:none; color:green; text-align:center; margin-top:10px;">ලැබුණා! ස්තූතියි.</p>
-    </div>
 
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyDMihnmvVsgY4Ol6xpnbEIQcfLh8kLDRZ6P3WC5KPJ7jV2TzT9y0xJYKyDsoE0RYNNZg/exec';
-        const form = document.getElementById('contact-form');
-
-        // IP එක ගන්න
-        fetch('https://api.ipify.org?format=json')
-            .then(r => r.json()).then(d => document.getElementById('ip').value = d.ip)
-            .catch(e => document.getElementById('ip').value = "N/A");
+<div class="card">
+    <h2>තොරතුරු එවන්න</h2>
+    <form id="contact-form">
+        <input type="text" name="name" placeholder="ඔබේ නම" required>
+        <input type="text" name="email" placeholder="ඊමේල් ලිපිනය">
+        <textarea name="message" rows="4" placeholder="ඔබේ පණිවිඩය මෙහි ලියන්න..." required></textarea>
         
-        document.getElementById('device').value = navigator.userAgent;
+        <input type="hidden" name="ip_address" id="ip">
+        <input type="hidden" name="device_info" id="device">
+        
+        <button type="submit" id="btn">යොමු කරන්න</button>
+    </form>
+    <div id="status">ලැබුණා! ස්තූතියි.</div>
+</div>
 
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            document.getElementById('btn').innerText = "යවමින්...";
-            
-            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-            .then(res => {
-                document.getElementById('status').style.display = "block";
-                document.getElementById('btn').innerText = "යොමු කරන්න";
-                form.reset();
-            })
-            .catch(err => alert("Error!"));
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyDMihnmvVsgY4Ol6xpnbEIQcfLh8kLDRZ6P3WC5KPJ7jV2TzT9y0xJYKyDsoE0RYNNZg/exec';
+    const form = document.getElementById('contact-form');
+    const btn = document.getElementById('btn');
+    const status = document.getElementById('status');
+
+    // IP ලබා ගැනීම
+    fetch('https://api.ipify.org?format=json')
+        .then(r => r.json()).then(d => document.getElementById('ip').value = d.ip)
+        .catch(e => document.getElementById('ip').value = "Unknown");
+    
+    document.getElementById('device').value = navigator.userAgent;
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        btn.disabled = true;
+        btn.innerText = "යවමින්...";
+        
+        fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+        .then(res => {
+            status.style.display = "block";
+            btn.disabled = false;
+            btn.innerText = "යොමු කරන්න";
+            form.reset();
+            setTimeout(() => { status.style.display = "none"; }, 5000);
+        })
+        .catch(err => {
+            alert("දෝෂයක්! නැවත උත්සාහ කරන්න.");
+            btn.disabled = false;
+            btn.innerText = "යොමු කරන්න";
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>
-
