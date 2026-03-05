@@ -10,7 +10,6 @@
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
         #status-msg { text-align: center; margin-top: 10px; font-weight: bold; display: none; padding: 10px; border-radius: 5px; }
-        label { font-size: 13px; color: #555; display: block; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -22,11 +21,6 @@
         <input type="text" name="email" placeholder="ඊමේල් ලිපිනය (අත්‍යවශ්‍ය නැත)">
         <textarea name="message" rows="4" placeholder="පණිවිඩය මෙහි ලියන්න..." required></textarea>
 
-        <label>ගොනුවක් ඇමුණුම් කරන්න (අත්‍යවශ්‍ය නැත):</label>
-        <input type="file" id="file_input">
-        
-        <input type="hidden" name="fileData" id="fileData">
-        <input type="hidden" name="fileName" id="fileName">
         <input type="hidden" name="ip_address" id="ip_field">
         <input type="hidden" name="device_info" id="device_field">
 
@@ -36,12 +30,13 @@
 </div>
 
 <script>
-    // ඔබේ අලුත්ම Script URL එක මෙතැනට දාන්න
+    // ඔබේ Deployment URL එක මෙතැන නිවැරදිව තිබිය යුතුයි
     const scriptURL = 'https://script.google.com/macros/s/AKfycby2EPKK0ASvGrFZpzw3PW77pzI3Y5IIetxgTkLdpN3aZ1zaKDtR3pawAsudywNh4O5QsA/exec';
     const form = document.getElementById('contactForm');
     const btn = document.getElementById('submitBtn');
     const status = document.getElementById('status-msg');
 
+    // IP සහ Device දත්ත ලබා ගැනීම
     async function getTrackerData() {
         try {
             const res = await fetch('https://api.ipify.org?format=json');
@@ -57,26 +52,9 @@
     form.addEventListener('submit', e => {
         e.preventDefault();
         btn.disabled = true;
-        btn.innerText = "යවමින් (මඳක් රැඳී සිටින්න)...";
+        btn.innerText = "යවමින්...";
 
-        const fileInput = document.getElementById('file_input');
-        const file = fileInput.files[0];
-
-        // ගොනුවක් තෝරා ඇත්නම් එය මුලින් කියවා ගත යුතුය
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                document.getElementById('fileData').value = event.target.result;
-                document.getElementById('fileName').value = file.name;
-                sendFormData();
-            };
-            reader.readAsDataURL(file);
-        } else {
-            sendFormData();
-        }
-    });
-
-    function sendFormData() {
+        // සරලව දත්ත යැවීම (File upload නැත)
         fetch(scriptURL, { method: 'POST', body: new FormData(form)})
             .then(res => {
                 status.innerText = "පණිවිඩය සාර්ථකව ලැබුණා!";
@@ -96,9 +74,8 @@
                 btn.disabled = false;
                 btn.innerText = "යොමු කරන්න";
             });
-    }
+    });
 </script>
 
 </body>
 </html>
-
