@@ -1,33 +1,147 @@
-<form id="contactForm">
-  <input type="text" name="name" placeholder="ඔබේ නම (Optional)">
-  <input type="email" name="email" placeholder="ඊමේල් (Optional)">
-  <textarea name="message" placeholder="පණිවිඩය" required></textarea>
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | අපව සම්බන්ධ කර ගන්න</title>
+    <style>
+        /* සරල සහ ආකර්ෂණීය පෙනුමක් ලබා දීම */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #eef2f7; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+        .contact-container { 
+            background: #ffffff; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+            width: 90%; 
+            max-width: 400px; 
+        }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 14px;
+        }
+        
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background-color: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        button:hover { background-color: #218838; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
 
-  <input type="hidden" id="ip_address" name="ip_address">
-  <input type="hidden" id="device_info" name="device_info">
+        #response-msg { 
+            text-align: center; 
+            margin-top: 15px; 
+            padding: 10px; 
+            border-radius: 5px; 
+            display: none; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
 
-  <button type="submit" id="submitBtn">යොමු කරන්න</button>
-</form>
+<div class="contact-container">
+    <h2>සම්බන්ධ වන්න</h2>
+    
+    <form id="contact-form">
+        <label>නම (අත්‍යවශ්‍ය නොවේ):</label>
+        <input type="text" name="name" placeholder="ඔබේ නම මෙහි ලියන්න">
+
+        <label>විද්‍යුත් තැපෑල:</label>
+        <input type="email" name="email" placeholder="example@mail.com">
+
+        <label>පණිවිඩය:</label>
+        <textarea name="message" rows="4" placeholder="ඔබේ පණිවිඩය ඇතුළත් කරන්න..." required></textarea>
+
+        <input type="hidden" id="ip_address" name="ip_address">
+        <input type="hidden" id="device_info" name="device_info">
+
+        <button type="submit" id="submit-btn">පණිවිඩය යොමු කරන්න</button>
+    </form>
+
+    <div id="response-msg"></div>
+</div>
 
 <script>
-  // පරිශීලකයාගේ IP ලිපිනය ලබා ගැනීමට නොමිලේ දෙන API එකක් පාවිච්චි කරමු
-  fetch('https://api.ipify.org?format=json')
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('ip_address').value = data.ip;
+    // 1. ඔබේ Google Apps Script URL එක මෙතැනට දාන්න
+    const scriptURL = 'https://script.google.com/macros/s/AKfycby1IMOBFclOChCLS9jTqhZQMuglJ146v-3_uoqHzhxZvDU8NnPWpuDd22EaeRXEYAusrg/exec'; 
+    const form = document.getElementById('contact-form');
+    const btn = document.getElementById('submit-btn');
+    const msgBox = document.getElementById('response-msg');
+
+    // 2. පිටුව Load වන විටම රහසිගතව IP සහ Device විස්තර ලබා ගැනීම
+    window.onload = function() {
+        fetch('https://ipapi.co/json/')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('ip_address').value = data.ip;
+                document.getElementById('device_info').value = `${data.city}, ${data.country_name} | ${navigator.userAgent}`;
+            })
+            .catch(err => {
+                console.log("IP lookup failed, using basic info.");
+                document.getElementById('ip_address').value = "Hidden/Blocked";
+                document.getElementById('device_info').value = navigator.userAgent;
+            });
+    };
+
+    // 3. පෝරමය Submit කරන විට සිදුවන දේ
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        
+        btn.disabled = true;
+        btn.innerText = "යවමින් පවතී...";
+        msgBox.style.display = "none";
+
+        fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+            .then(response => {
+                // සාර්ථක පණිවිඩය පෙන්වීම
+                msgBox.innerText = "පණිවිඩය සාර්ථකව ලැබුණා! ස්තූතියි.";
+                msgBox.style.backgroundColor = "#d4edda";
+                msgBox.style.color = "#155724";
+                msgBox.style.display = "block";
+                
+                // පෝරමය හිස් කිරීම (Reset)
+                form.reset();
+                
+                btn.disabled = false;
+                btn.innerText = "පණිවිඩය යොමු කරන්න";
+
+                // තත්පර 5කට පසු පණිවිඩය ඉවත් කිරීම
+                setTimeout(() => { msgBox.style.display = "none"; }, 5000);
+            })
+            .catch(error => {
+                msgBox.innerText = "කණගාටුයි, දෝෂයක් සිදු විය. නැවත උත්සාහ කරන්න.";
+                msgBox.style.backgroundColor = "#f8d7da";
+                msgBox.style.color = "#721c24";
+                msgBox.style.display = "block";
+                btn.disabled = false;
+                btn.innerText = "පණිවිඩය යොමු කරන්න";
+            });
     });
-
-  // පරිශීලකයාගේ Browser සහ Device තොරතුරු ලබා ගැනීම
-  document.getElementById('device_info').value = navigator.userAgent;
-
-  const scriptURL = 'https://script.google.com/macros/s/AKfycby1IMOBFclOChCLS9jTqhZQMuglJ146v-3_uoqHzhxZvDU8NnPWpuDd22EaeRXEYAusrg/exec';
-  const form = document.getElementById('contactForm');
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-      .then(response => alert("පණිවිඩය යැවුණා!"))
-      .catch(error => console.error('Error!', error.message));
-  });
-
 </script>
+
+</body>
+</html>
