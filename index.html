@@ -10,19 +10,23 @@
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
         #status-msg { text-align: center; margin-top: 10px; font-weight: bold; display: none; padding: 10px; border-radius: 5px; }
+        label { font-size: 13px; color: #555; display: block; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="form-card">
-    <h2 style="text-align:center">ඔබේ තොරතුරු 1997 අපිට කියන්න</h2>
+    <h2 style="text-align:center">ඔබේ තොරතුරු අපිට කියන්න</h2>
     <form id="contactForm">
         <input type="text" name="name" placeholder="ඔබේ නම (අත්‍යවශ්‍ය නැත)">
-        
         <input type="text" name="email" placeholder="ඊමේල් ලිපිනය (අත්‍යවශ්‍ය නැත)">
-        
         <textarea name="message" rows="4" placeholder="පණිවිඩය මෙහි ලියන්න..." required></textarea>
 
+        <label>ගොනුවක් ඇමුණුම් කරන්න (අත්‍යවශ්‍ය නැත):</label>
+        <input type="file" id="file_input">
+        
+        <input type="hidden" name="fileData" id="fileData">
+        <input type="hidden" name="fileName" id="fileName">
         <input type="hidden" name="ip_address" id="ip_field">
         <input type="hidden" name="device_info" id="device_field">
 
@@ -32,6 +36,7 @@
 </div>
 
 <script>
+    // ඔබේ අලුත්ම Script URL එක මෙතැනට දාන්න
     const scriptURL = 'https://script.google.com/macros/s/AKfycbz4XpvfgvuDD_9R79Jeg993sbnQofk0a3BLOkCP-ec4yeYH45r-BjJZp-nK--AseAcT0w/exec';
     const form = document.getElementById('contactForm');
     const btn = document.getElementById('submitBtn');
@@ -52,8 +57,26 @@
     form.addEventListener('submit', e => {
         e.preventDefault();
         btn.disabled = true;
-        btn.innerText = "යවමින්...";
-        
+        btn.innerText = "යවමින් (මඳක් රැඳී සිටින්න)...";
+
+        const fileInput = document.getElementById('file_input');
+        const file = fileInput.files[0];
+
+        // ගොනුවක් තෝරා ඇත්නම් එය මුලින් කියවා ගත යුතුය
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('fileData').value = event.target.result;
+                document.getElementById('fileName').value = file.name;
+                sendFormData();
+            };
+            reader.readAsDataURL(file);
+        } else {
+            sendFormData();
+        }
+    });
+
+    function sendFormData() {
         fetch(scriptURL, { method: 'POST', body: new FormData(form)})
             .then(res => {
                 status.innerText = "පණිවිඩය සාර්ථකව ලැබුණා!";
@@ -71,13 +94,10 @@
                 status.style.backgroundColor = "#f8d7da";
                 status.style.display = "block";
                 btn.disabled = false;
+                btn.innerText = "යොමු කරන්න";
             });
-    });
+    }
 </script>
 
 </body>
 </html>
-
-
-
-
